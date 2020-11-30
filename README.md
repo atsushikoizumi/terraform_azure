@@ -1,2 +1,2 @@
-# terraform_azure
-Azure infrastructure as code
+resource groups に対して、Azure Policy を適用する。
+
