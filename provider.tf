@@ -14,7 +14,7 @@ terraform {
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/service_principal_client_secret
 # az ad sp create-for-rbac
 provider "azurerm" {
-  version = "=2.4.0"
+  version = "=2.38.0"
   subscription_id = var.subscription_id
   client_id       = var.client_id
   client_secret   = var.client_secret
