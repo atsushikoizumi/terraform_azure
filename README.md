@@ -59,6 +59,7 @@ resource groups に対して、Azure Policy を適用するまでの手順を記
       key                  = "test01.tfstate"
     }
     ```
+
 5. provider 設定<br>
     続いて、provider azurerm で AD認証情報を記述します。<br>
     下記の例では変数で参照する形にしています。
@@ -96,6 +97,7 @@ resource groups に対して、Azure Policy を適用するまでの手順を記
       -target azurerm_policy_assignment.inherit_tag_from_rg
     $ terraform apply
     ```
+
 そのまま Tearrform apply してしまうと、Azure policy のアタッチに1分程度の時間が掛かってしまい、先に Virtual Network が作成されてしまいます。<br>
 それでは、Resource group に設定した Azure Policy がリソースに適用されません。<br>
 以上です。
