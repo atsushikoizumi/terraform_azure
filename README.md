@@ -20,32 +20,10 @@ resource groups に対して、Azure Policy を適用するまでの手順を記
     [Subscription level]
     $ az account set --subscription="SUBSCRIPTION_ID"
     $ az ad sp create-for-rbac --name="koizumi-terraform" --scopes="/subscriptions/SUBSCRIPTION_ID"
-        {
-        "appId": "00000000-0000-0000-0000-000000000000",
-        "displayName": "koizumi-terraform",
-        "name": "http://koizumi-terraform",
-        "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-        "tenant": "00000000-0000-0000-0000-000000000000"
-        }
     $ az role assignment create `
       --assignee="00000000-0000-0000-0000-000000000000" `
       --role="User Access Administrator" `
       --scope="/subscriptions/00000000-0000-0000-0000-000000000000"
-        {
-        "canDelegate": null,
-        "condition": null,
-        "conditionVersion": null,
-        "description": null,
-        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Authorization/roleAssignments/00000000-0000-0000-0000-000000000000",
-        "name": "00000000-0000-0000-0000-000000000000",
-        "principalId": "00000000-0000-0000-0000-000000000000",
-        "principalName": "http://terraform-principal",
-        "principalType": "ServicePrincipal",
-        "roleDefinitionId": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Authorization/roleDefinitions/00000000-0000-0000-0000-000000000000",
-        "roleDefinitionName": "User Access Administrator",
-        "scope": "/subscriptions/00000000-0000-0000-0000-000000000000",
-        "type": "Microsoft.Authorization/roleAssignments"
-        }
     ```
 
 4. backend 設定<br>
