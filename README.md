@@ -87,7 +87,8 @@ resource groups に対して、Azure Policy を適用するまでの手順を記
 
 # Terraform apply
 
-以下の手順で実行します。<br>
+以下の手順で実行します。先に Azure Policy をアタッチします。<br>
+
     ```
     $ terraform init
     $ terraform plan
