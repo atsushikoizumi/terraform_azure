@@ -8,35 +8,59 @@ resource "azurerm_resource_group" "test01" {
   }
 }
 
-# Policy assignment
-resource "azurerm_policy_assignment" "Allowed_locations" {
-  name                 = "Allowed-locations"
-  scope                = azurerm_resource_group.test01.id
-  policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/e56962a6-4747-49cd-b67b-bf8b01975c4c"
-  description          = "This policy enables you to restrict the locations your organization can specify when deploying resources. Use to enforce your geo-compliance requirements. Excludes resource groups, Microsoft.AzureActiveDirectory/b2cDirectories, and resources that use the 'global' region."
-  display_name         = "Allowed locations"
-  identity {
-    type = "SystemAssigned"
-  }
-  location   = "eastus"
-  parameters = <<PARAMETERS
-    {
-      "listOfAllowedLocations": {
-        "value": [ "East US","East US 2" ]
-      }
-    }
-  PARAMETERS
-}
-
 # Create a virtual network within the resource group
-resource "azurerm_virtual_network" "test01" {
-  name                = "test01"
+resource "azurerm_virtual_network" "vnet01" {
+  name                = "vnet01"
   resource_group_name = azurerm_resource_group.test01.name
   location            = azurerm_resource_group.test01.location
-  address_space       = ["10.0.0.0/16"]
+  address_space       = ["10.7.0.0/16"]
   tags = {
     "Owner" = "koizumi",
     "Env"   = "test01"
   }
 }
 
+# Create 2 Subnets within the virtual network
+resource "azurerm_subnet" "subnet01" {
+  name                 = "subnet01"
+  virtual_network_name = azurerm_virtual_network.vnet01.name
+  resource_group_name  = azurerm_resource_group.test01.name
+  address_prefixes     = ["10.7.1.0/24"]
+}
+resource "azurerm_subnet" "subnet02" {
+  name                 = "subnet02"
+  virtual_network_name = azurerm_virtual_network.vnet01.name
+  resource_group_name  = azurerm_resource_group.test01.name
+  address_prefixes     = ["10.7.2.0/24"]
+}
+
+# Create 2 SecurityGroups
+resource "azurerm_network_security_group" "sg01" {
+  name                = "sg01"
+  location            = azurerm_resource_group.test01.location
+  resource_group_name = azurerm_resource_group.test01.name
+  tags = {
+    "Owner" = "koizumi",
+    "Env"   = "test01"
+  }
+}
+resource "azurerm_network_security_group" "sg02" {
+  name                = "sg02"
+  location            = azurerm_resource_group.test01.location
+  resource_group_name = azurerm_resource_group.test01.name
+  tags = {
+    "Owner" = "koizumi",
+    "Env"   = "test01"
+  }
+}
+
+
+# Associates a Network Security Group with a Subnet 
+resource "azurerm_subnet_network_security_group_association" "sg01" {
+  subnet_id                 = azurerm_subnet.subnet01.id
+  network_security_group_id = azurerm_network_security_group.sg01.id
+}
+resource "azurerm_subnet_network_security_group_association" "sg02" {
+  subnet_id                 = azurerm_subnet.subnet02.id
+  network_security_group_id = azurerm_network_security_group.sg02.id
+}
