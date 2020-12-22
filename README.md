@@ -1,7 +1,7 @@
-ResourceManager というブランチ名にしましたが、便宜上、Terraform を使います。<br>
-resource groups に対して、Azure Policy を適用するまでの手順を記載します。
+Terraform を使います。<br>
+resource groups に対して、Subnet, SecurityGroup を適用するまでの手順を記載します。
 
-# 準備
+# 構築手順
 以下の手順で実施します。
 
 1. az cli の install<br>
@@ -28,39 +28,36 @@ resource groups に対して、Azure Policy を適用するまでの手順を記
         }
     ```
 
-4. terraform init<br>
+4. backend を定義<br>
     事前に StorageAccount を作成しておきます。<br>
     backend を StorageAccount に設定します。
     ```
-      backend "azurerm" {
-        resource_group_name  = "atsushi.koizumi.data"
-        storage_account_name = "terraform0tfstate"
-        container_name       = "tfstate"
-        key                  = "test01.tfstate"
-      }
+    backend "azurerm" {
+      resource_group_name  = "atsushi.koizumi.data"
+      storage_account_name = "terraform0tfstate"
+      container_name       = "tfstate"
+      key                  = "test01.tfstate"
+    }
     ```
-    続いて、provider azurerm で AD認証情報を記述します。<br>
+5. provider を定義<br>
+    provider azurerm で AD認証情報を記述します。<br>
     下記の例では変数で参照する形にしています。
     ```
-        provider "azurerm" {
-        version = "=2.4.0"
-        subscription_id = var.subscription_id
-        client_id       = var.client_id
-        client_secret   = var.client_secret
-        tenant_id       = var.tenant_id
-
-        features {}
-        }
+    provider "azurerm" {
+    version = "=2.4.0"
+    subscription_id = var.subscription_id
+    client_id       = var.client_id
+    client_secret   = var.client_secret
+    tenant_id       = var.tenant_id
+    features {}
+    }
     ```
 
-# Azure Policy
+5. Terraform apply
+    tf ファイルの内容をデプロイします。
+    ```
+    $ terraform init
+    $ terraform apply
+    ```
 
-1. build in policy<br>
-    今回は Azure Policy built-in policy definitions のみで行います。<br>
-    https://docs.microsoft.com/ja-jp/azure/governance/policy/samples/built-in-policies
-
-2. Policy のアタッチ先
-    管理グループ、サブスクリプション、リソースグループが主なアタッチ先です。
-
-# ARM（Azure Resource Manager）
-ARM は Azure オリジナルの Terraform/CloudFormation に当たります。
+以上です。
