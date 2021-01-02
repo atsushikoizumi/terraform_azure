@@ -20,12 +20,20 @@ resource "azurerm_virtual_network" "vnet01" {
   }
 }
 
-# Create 1 Subnet within the virtual network
+# Create 2 Subnets within the virtual network
 resource "azurerm_subnet" "subnet01" {
   name                 = "subnet01"
   virtual_network_name = azurerm_virtual_network.vnet01.name
   resource_group_name  = azurerm_resource_group.test01.name
   address_prefixes     = ["10.7.1.0/24"]
+}
+
+resource "azurerm_subnet" "subnet02" {
+  name                 = "subnet02"
+  virtual_network_name = azurerm_virtual_network.vnet01.name
+  resource_group_name  = azurerm_resource_group.test01.name
+  address_prefixes     = ["10.7.2.0/24"]
+  service_endpoints    = ["Microsoft.Sql"]
 }
 
 # Create SecurityGroup
@@ -34,15 +42,15 @@ resource "azurerm_network_security_group" "sg01" {
   location            = azurerm_resource_group.test01.location
   resource_group_name = azurerm_resource_group.test01.name
   security_rule {
-      name                       = "RDP"
-      priority                   = 1001
-      direction                  = "Inbound"
-      access                     = "Allow"
-      protocol                   = "Tcp"
-      source_port_range          = "*"
-      source_address_prefix      = var.home_ip
-      destination_port_range     = "3389"
-      destination_application_security_group_ids = [azurerm_application_security_group.nicsg01.id]
+    name                                       = "RDP"
+    priority                                   = 1001
+    direction                                  = "Inbound"
+    access                                     = "Allow"
+    protocol                                   = "Tcp"
+    source_port_range                          = "*"
+    source_address_prefix                      = var.home_ip
+    destination_port_range                     = "3389"
+    destination_application_security_group_ids = [azurerm_application_security_group.nicsg01.id]
   }
   tags = {
     "Owner" = "koizumi",
@@ -89,7 +97,7 @@ resource "azurerm_network_interface" "nic01" {
     subnet_id                     = azurerm_subnet.subnet01.id
     private_ip_address_version    = "IPv4"
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id = azurerm_public_ip.public01.id
+    public_ip_address_id          = azurerm_public_ip.public01.id
   }
   tags = {
     "Owner" = "koizumi",
@@ -99,8 +107,8 @@ resource "azurerm_network_interface" "nic01" {
 
 # Connect the security group to the network interface
 resource "azurerm_network_interface_application_security_group_association" "nic01" {
-    network_interface_id          = azurerm_network_interface.nic01.id
-    application_security_group_id = azurerm_application_security_group.nicsg01.id
+  network_interface_id          = azurerm_network_interface.nic01.id
+  application_security_group_id = azurerm_application_security_group.nicsg01.id
 }
 
 # Create Virtual Machine
