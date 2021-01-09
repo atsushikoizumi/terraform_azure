@@ -252,12 +252,11 @@ resource "azurerm_mssql_server_extended_auditing_policy" "test01" {
 resource "azurerm_mssql_database" "test01" {
   name           = "test01"
   server_id      = azurerm_mssql_server.sqlserver01.id
+  sku_name       = "S1"
+  max_size_gb    = 250
   collation      = "SQL_Latin1_General_CP1_CI_AS"
-  license_type   = "LicenseIncluded"
-  max_size_gb    = 4
-  read_scale     = true
-  sku_name       = "BC_Gen5_2"
-  zone_redundant = true
+  read_scale     = false
+  zone_redundant = false
   tags = {
     "Owner" = "koizumi",
     "Env"   = "test01"

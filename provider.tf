@@ -11,6 +11,7 @@ terraform {
 }
 
 # provider azurerm
+# terraform force-unlock ID
 provider "azurerm" {
   version         = "=2.38.0"
   subscription_id = var.subscription_id
