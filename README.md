@@ -1,8 +1,79 @@
-Azure infrastructure as code
+Azure infrastructure as code<br>
 
-# 概要
-各ブランチ毎に Azure の操作方法について検証していく。
+# Poweshell install for mac
+ARM Templete を使った Azure resource の deploy 方法を確認する。
 
-1. ResourceManager
-    resource groups に Azure Policy を適用する方法を検証する。
 
+# 01. install powershell for mac
+以下のコマンドで Mac に PowerShell をインストールできます。
+```
+$ brew install openssl
+$ brew install curl
+$ brew install --cask powershell
+$ brew upgrade powershell --cask
+```
+
+# 02. Set PSRepository
+レポジトリを登録します。
+```
+PS > Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+PS > Get-PSRepository
+
+Name                      InstallationPolicy   SourceLocation
+----                      ------------------   --------------
+PSGallery                 Untrusted            https://www.powershellgallery.com/api/v2
+```
+
+# 03. Install Az Modules
+Azure を操作するための Module をインストールします。
+```
+PS > Install-Module -Name Az -Scope CurrentUser
+PS > Get-InstalledModule
+```
+
+# 04. login
+Azure にログインします。
+```
+PS > Connect-AzAccount
+```
+
+# 05. Create Resource Group
+テスト用のリソースグループを作成します。
+```
+PS > New-AzResourceGroup -Name sample-rg01 -Location "East US"
+```
+
+# 05. Test ARM Templete
+テンプレートをテストします。
+```
+PS > New-AzResourceGroupDeploymentWhatIfResult `
+  -Name ExampleDeployment `
+  -ResourceGroupName sample-rg01 `
+  -TemplateFile sample.json
+```
+
+# 06. ARM Templete Deploy
+テンプレートをデプロイします。
+```
+PS > New-AzResourceGroupDeployment `
+  -Name ExampleDeployment `
+  -ResourceGroupName sample-rg01 `
+  -TemplateFile sample.json
+```
+
+# 07. Get-AzResourceGroupDeployment
+デプロイ履歴を確認します。
+```
+PS > Get-AzResourceGroupDeployment `
+  -ResourceGroupName sample-rg01 
+```
+
+# 08. Get-AzResourceGroupDeploymentOperation
+デプロイ履歴の詳細を確認します。
+```
+Get-AzResourceGroupDeploymentOperation `
+  -ResourceGroupName sample-rg01 `
+  -DeploymentName ExampleDeployment-2
+```
+
+以上です。
