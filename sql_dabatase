@@ -1,0 +1,67 @@
+# Create SQL Serrver
+# CREATE LOGIN xx_adm WITH PASSWORD = 'abc123X!'
+# [use master] CREATE USER xx_adm FOR LOGIN xx_adm WITH DEFAULT_SCHEMA = dbo
+resource "azurerm_mssql_server" "sqlserver01" {
+  name                          = "koizumi-sqlserver01"
+  resource_group_name           = azurerm_resource_group.test01.name
+  location                      = azurerm_resource_group.test01.location
+  version                       = "12.0"
+  administrator_login           = "adminsqlserver"
+  administrator_login_password  = "P@$$w0rd1234!"
+  public_network_access_enabled = true
+  tags = {
+    "Owner" = "koizumi",
+    "Env"   = "test01"
+  }
+}
+
+# Create VNet for SQL Server
+resource "azurerm_sql_virtual_network_rule" "sqlvnetrule01" {
+  name                = "sqlvnetrule01"
+  resource_group_name = azurerm_resource_group.test01.name
+  server_name         = azurerm_mssql_server.sqlserver01.name
+  subnet_id           = azurerm_subnet.subnet02.id
+}
+
+# SQLServer FireWall
+resource "azurerm_sql_firewall_rule" "sqlfirewall01" {
+  name                = "sqlfirewall01"
+  resource_group_name = azurerm_resource_group.test01.name
+  server_name         = azurerm_mssql_server.sqlserver01.name
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "0.0.0.0"
+}
+
+resource "azurerm_sql_firewall_rule" "sqlfirewall02" {
+  name                = "sqlfirewall02"
+  resource_group_name = azurerm_resource_group.test01.name
+  server_name         = azurerm_mssql_server.sqlserver01.name
+  start_ip_address    = azurerm_network_interface.nic01.private_ip_address
+  end_ip_address      = azurerm_network_interface.nic01.private_ip_address
+}
+
+# Extended auditting policy
+resource "azurerm_mssql_server_extended_auditing_policy" "test01" {
+  server_id                               = azurerm_mssql_server.sqlserver01.id
+  storage_endpoint                        = azurerm_storage_account.test01.primary_blob_endpoint
+  storage_account_access_key              = azurerm_storage_account.test01.primary_access_key
+  storage_account_access_key_is_secondary = false
+  retention_in_days                       = 6
+}
+
+# Create SQL Database
+# CREATE USER xx_adm FOR LOGIN xx_adm WITH DEFAULT_SCHEMA = dbo
+# ALTER ROLE db_owner ADD MEMBER xx_adm
+resource "azurerm_mssql_database" "test01" {
+  name           = "test01"
+  server_id      = azurerm_mssql_server.sqlserver01.id
+  sku_name       = "S1"
+  max_size_gb    = 250
+  collation      = "SQL_Latin1_General_CP1_CI_AS"
+  read_scale     = false
+  zone_redundant = false
+  tags = {
+    "Owner" = "koizumi",
+    "Env"   = "test01"
+  }
+}
